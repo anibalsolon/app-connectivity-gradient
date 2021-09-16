@@ -71,23 +71,23 @@ del corr
 gradients = np.zeros((data_shape[0], gm.gradients_.shape[1]))
 gradients[np.where(mask)[0]] = gm.gradients_
 
+lh_new_img = GiftiImage()
+rh_new_img = GiftiImage()
 for g in range(args.n_components):
-    new_img = GiftiImage()
-    new_img.add_gifti_data_array(
+   lh_new_img.add_gifti_data_array(
         GiftiDataArray(
             gradients[:lh_shape[0], g],
             'NIFTI_INTENT_TIME_SERIES',
             'NIFTI_TYPE_FLOAT32'
         )
     )
-    nb.save(new_img, f'lh.gradient{g + 1}.func.gii')
-
-    new_img = GiftiImage()
-    new_img.add_gifti_data_array(
+   rh_new_img.add_gifti_data_array(
         GiftiDataArray(
             gradients[lh_shape[0]:, g],
             'NIFTI_INTENT_TIME_SERIES',
             'NIFTI_TYPE_FLOAT32'
         )
     )
-    nb.save(new_img, f'rh.gradient{g + 1}.func.gii')
+
+nb.save(lh_new_img, f'gradients/left.gii')
+nb.save(rh_new_img, f'gradients/right.gii')
