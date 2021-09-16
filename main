@@ -4,15 +4,14 @@
 
 set -xe
 
-INPUT=$(jq -r .data config.json)
+INPUT=$(jq -r .input config.json)
 
-APPROACH=$(jq -r .approach config.json)
-KERNEL=$(jq -r .kernel config.json)
-COMPONENTS=$(jq -r .n_components config.json)
-RANDOM_STATE=$(jq -r .random_state config.json)
+APPROACH=$(jq -r '.approach // "diffusion-maps"' config.json)
+KERNEL=$(jq -r '.kernel // "pearson"' config.json)
+COMPONENTS=$(jq -r '.n_components // 3' config.json)
+RANDOM_STATE=$(jq -r '.random_state // 0' config.json)
 
 mkdir -p gradients
 
-time singularity run -e \
-    docker://anibalsolon/app-connectivity-gradient:v0.0.1 \
-        $APPROACH $KERNEL $INPUT --n_components $COMPONENTS --random_state $random_state
+time singularity run -e docker://anibalsolon/app-connectivity-gradient:v0.0.1 \
+    python main.py --n_components $COMPONENTS --random_state $RANDOM_STATE $APPROACH $KERNEL $INPUT
