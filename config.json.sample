@@ -1,4 +1,3 @@
 {
-    "bold": "bold.nii.gz",
-    "mask": "mask.nii.gz",
+    "data": ["left.gii", "right.gii"]
 }
