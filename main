@@ -4,24 +4,15 @@
 
 set -xe
 
-INPUT=$(jq -r .bold config.json)
-MASK=$(jq -r .mask config.json)
-if [ $MASK == "null" ]; then
-    MASK=""
-fi
+INPUT=$(jq -r .data config.json)
 
 APPROACH=$(jq -r .approach config.json)
 KERNEL=$(jq -r .kernel config.json)
 COMPONENTS=$(jq -r .n_components config.json)
 RANDOM_STATE=$(jq -r .random_state config.json)
 
-OPTS=""
-if [ ! -z "$MASK" ]; then
-    OPTS="$OPTS -mask $MASK"
-fi
-
 mkdir -p gradients
 
 time singularity run -e \
     docker://anibalsolon/app-connectivity-gradient:v0.0.1 \
-        $APPROACH $KERNEL $INPUT --n_components $COMPONENTS --random_state $RANDOM_STATE $OPTS
+        $APPROACH $KERNEL $INPUT --n_components $COMPONENTS --random_state $random_state
