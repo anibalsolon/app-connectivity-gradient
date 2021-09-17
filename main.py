@@ -10,21 +10,15 @@ from brainspace.gradient import GradientMaps
 from nilearn.connectome import ConnectivityMeasure
 
 
-def is_valid_surface_data(parser, arg):
+def is_valid_file(parser, arg):
     if not os.path.exists(arg):
-        parser.error(f"The folder {arg} does not exist!")
-    lh = os.path.join(arg, 'left.gii')
-    if not os.path.exists(lh):
-        parser.error(f"The file {lh} does not exist!")
-    rh = os.path.join(arg, 'right.gii')
-    if not os.path.exists(rh):
-        parser.error(f"The file {rh} does not exist!")
-    return (lh, rh)
+        parser.error(f"The file {arg} does not exist!")
+    return arg
 
 parser = argparse.ArgumentParser(description='Connectivity Gradients')
 parser.add_argument('approach', choices=['diffusion-maps', 'laplacian-eigenmaps', 'pca-maps'])
 parser.add_argument('kernel', choices=['pearson', 'spearman', 'normalized-angle', 'cosine', 'gaussian'])
-parser.add_argument('input', type=lambda x: is_valid_surface_data(parser, x))
+parser.add_argument('input', nargs=2, metavar=('left', 'right'), type=lambda x: is_valid_file(parser, x))
 parser.add_argument('--n_components', default=3, type=int)
 parser.add_argument('--random_state', default=0, type=int)
 

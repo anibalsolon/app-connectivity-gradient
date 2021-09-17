@@ -1,3 +1,4 @@
 {
-    "input": "surface-data"
+    "left": "surface-data/left.gii",
+    "right": "surface-data/right.gii",
 }

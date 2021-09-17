@@ -4,7 +4,8 @@
 
 set -xe
 
-INPUT=$(jq -r .input config.json)
+LH_GII=$(jq -r .left config.json)
+RH_GII=$(jq -r .right config.json)
 
 APPROACH=$(jq -r '.approach // "diffusion-maps"' config.json)
 KERNEL=$(jq -r '.kernel // "pearson"' config.json)
@@ -14,4 +15,4 @@ RANDOM_STATE=$(jq -r '.random_state // 0' config.json)
 mkdir -p gradients
 
 time singularity run -e docker://anibalsolon/app-connectivity-gradient:v0.0.1 \
-    python main.py --n_components $COMPONENTS --random_state $RANDOM_STATE $APPROACH $KERNEL $INPUT
+    python main.py --n_components $COMPONENTS --random_state $RANDOM_STATE $APPROACH $KERNEL $LH_GII $RH_GII
