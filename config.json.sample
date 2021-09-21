@@ -1,4 +1,8 @@
 {
     "left": "surface-data/left.gii",
     "right": "surface-data/right.gii",
+    "approach": "diffusion-maps,
+    "kernel": "pearson",
+    "n_components": 3,
+    "random_state": 0,
 }
