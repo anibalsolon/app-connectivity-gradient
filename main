@@ -8,7 +8,7 @@ LH_GII=$(jq -r .left config.json)
 RH_GII=$(jq -r .right config.json)
 
 APPROACH=$(jq -r '.approach // "diffusion-maps"' config.json)
-KERNEL=$(jq -r '.kernel // "pearson"' config.json)
+KERNEL=$(jq -r '.kernel // "normalized-angle"' config.json)
 COMPONENTS=$(jq -r '.n_components // 3' config.json)
 RANDOM_STATE=$(jq -r '.random_state // 0' config.json)
 

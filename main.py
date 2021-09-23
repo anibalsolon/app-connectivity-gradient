@@ -32,8 +32,18 @@ approach = {
 kernel = args.kernel.replace('-', '_')
 
 
-lh = nb.load(args.input[0]).agg_data('time series')
-rh = nb.load(args.input[1]).agg_data('time series')
+lh = nb.load(args.input[0]).agg_data('NIFTI_INTENT_TIME_SERIES')
+rh = nb.load(args.input[1]).agg_data('NIFTI_INTENT_TIME_SERIES')
+
+if not lh or not rh:
+    lh = nb.load(args.input[0]).agg_data('NIFTI_INTENT_NORMAL')
+    rh = nb.load(args.input[1]).agg_data('NIFTI_INTENT_NORMAL')
+
+if type(lh) == tuple:
+    lh = np.array(lh).T
+if type(rh) == tuple:
+    rh = np.array(rh).T
+
 lh_shape = lh.shape
 rh_shape = rh.shape
 
@@ -42,14 +52,14 @@ data_shape = data.shape
 
 del lh, rh
 
-atlas = datasets.fetch_atlas_surf_destrieux()
-regions = atlas['labels'].copy()
-masked_regions = [b'Medial_wall', b'Unknown']
-masked_labels = [regions.index(r) for r in masked_regions]
-regions = [r for r in regions if r not in masked_regions]
-labeling = np.concatenate([atlas['map_left'], atlas['map_right']])
-mask = ~np.isin(labeling, masked_labels)
-data = data[mask]
+# atlas = datasets.fetch_atlas_surf_destrieux()
+# regions = atlas['labels'].copy()
+# masked_regions = [b'Medial_wall', b'Unknown']
+# masked_labels = [regions.index(r) for r in masked_regions]
+# regions = [r for r in regions if r not in masked_regions]
+# labeling = np.concatenate([atlas['map_left'], atlas['map_right']])
+# mask = ~np.isin(labeling, masked_labels)
+# data = data[mask]
 
 corr = ConnectivityMeasure(kind='correlation').fit_transform([data.T])[0]
 gm = GradientMaps(
@@ -62,8 +72,9 @@ gm.fit(corr)
 
 del corr
 
-gradients = np.zeros((data_shape[0], gm.gradients_.shape[1]))
-gradients[np.where(mask)[0]] = gm.gradients_
+# gradients = np.zeros((data_shape[0], gm.gradients_.shape[1]))
+# gradients[np.where(mask)[0]] = gm.gradients_
+gradients = gm.gradients_
 
 lh_new_img = GiftiImage()
 rh_new_img = GiftiImage()
