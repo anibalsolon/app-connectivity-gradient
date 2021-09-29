@@ -31,6 +31,7 @@ approach = {
 }[args.approach]
 kernel = args.kernel.replace('-', '_')
 
+print('Loading data')
 
 lh = nb.load(args.input[0]).agg_data('NIFTI_INTENT_TIME_SERIES')
 rh = nb.load(args.input[1]).agg_data('NIFTI_INTENT_TIME_SERIES')
@@ -47,7 +48,7 @@ if type(rh) == tuple:
 lh_shape = lh.shape
 rh_shape = rh.shape
 
-data = np.concatenate((lh, rh))
+data = np.concatenate((lh, rh)).astype(np.float32)
 data_shape = data.shape
 
 del lh, rh
@@ -61,7 +62,10 @@ del lh, rh
 # mask = ~np.isin(labeling, masked_labels)
 # data = data[mask]
 
+print('Computing correlation matrix')
 corr = ConnectivityMeasure(kind='correlation').fit_transform([data.T])[0]
+
+print('Computing gradients')
 gm = GradientMaps(
     n_components=args.n_components,
     kernel=kernel,
@@ -72,6 +76,7 @@ gm.fit(corr)
 
 del corr
 
+print('Saving data')
 # gradients = np.zeros((data_shape[0], gm.gradients_.shape[1]))
 # gradients[np.where(mask)[0]] = gm.gradients_
 gradients = gm.gradients_
