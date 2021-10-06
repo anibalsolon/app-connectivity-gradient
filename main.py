@@ -36,7 +36,7 @@ print('Loading data')
 lh = nb.load(args.input[0]).agg_data('NIFTI_INTENT_TIME_SERIES')
 rh = nb.load(args.input[1]).agg_data('NIFTI_INTENT_TIME_SERIES')
 
-if not lh or not rh:
+if not isinstance(lh, np.ndarray) or not isinstance(rh, np.ndarray):
     lh = nb.load(args.input[0]).agg_data('NIFTI_INTENT_NORMAL')
     rh = nb.load(args.input[1]).agg_data('NIFTI_INTENT_NORMAL')
 
