@@ -7,6 +7,7 @@ from nibabel.gifti.gifti import GiftiImage, GiftiDataArray
 
 import numpy as np
 from brainspace.gradient import GradientMaps
+from brainspace.datasets import load_parcellation
 from nilearn.connectome import ConnectivityMeasure
 
 
@@ -31,7 +32,6 @@ approach = {
 }[args.approach]
 kernel = args.kernel.replace('-', '_')
 
-print('Loading data')
 
 lh = nb.load(args.input[0]).agg_data('NIFTI_INTENT_TIME_SERIES')
 rh = nb.load(args.input[1]).agg_data('NIFTI_INTENT_TIME_SERIES')
@@ -53,17 +53,15 @@ data_shape = data.shape
 
 del lh, rh
 
-# atlas = datasets.fetch_atlas_surf_destrieux()
-# regions = atlas['labels'].copy()
-# masked_regions = [b'Medial_wall', b'Unknown']
-# masked_labels = [regions.index(r) for r in masked_regions]
-# regions = [r for r in regions if r not in masked_regions]
-# labeling = np.concatenate([atlas['map_left'], atlas['map_right']])
-# mask = ~np.isin(labeling, masked_labels)
-# data = data[mask]
+parcellation = load_parcellation('schaefer', scale=400, join=True)
+labels = np.unique(parcellation)
+labels = labels[labels != 0].tolist()
+data = np.array([np.mean(data[parcellation == l], axis=0) for l in labels])
 
 print('Computing correlation matrix')
 corr = ConnectivityMeasure(kind='correlation').fit_transform([data.T])[0]
+
+print('Matrix size', corr.shape)
 
 print('Computing gradients')
 gm = GradientMaps(
@@ -77,9 +75,10 @@ gm.fit(corr)
 del corr
 
 print('Saving data')
-# gradients = np.zeros((data_shape[0], gm.gradients_.shape[1]))
-# gradients[np.where(mask)[0]] = gm.gradients_
-gradients = gm.gradients_
+gradients = np.zeros((data_shape[0], gm.gradients_.shape[1]))
+for i, l in enumerate(labels):
+    gradients[parcellation == l] = gm.gradients_[i]
+# gradients = gm.gradients_
 
 lh_new_img = GiftiImage()
 rh_new_img = GiftiImage()
