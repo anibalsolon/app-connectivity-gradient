@@ -2,7 +2,6 @@ import argparse
 import os.path
 
 import nibabel as nb
-from nilearn import datasets
 from nibabel.gifti.gifti import GiftiImage, GiftiDataArray
 
 import numpy as np
@@ -32,18 +31,8 @@ approach = {
 }[args.approach]
 kernel = args.kernel.replace('-', '_')
 
-
-lh = nb.load(args.input[0]).agg_data('NIFTI_INTENT_TIME_SERIES')
-rh = nb.load(args.input[1]).agg_data('NIFTI_INTENT_TIME_SERIES')
-
-if not isinstance(lh, np.ndarray) or not isinstance(rh, np.ndarray):
-    lh = nb.load(args.input[0]).agg_data('NIFTI_INTENT_NORMAL')
-    rh = nb.load(args.input[1]).agg_data('NIFTI_INTENT_NORMAL')
-
-if type(lh) == tuple:
-    lh = np.array(lh).T
-if type(rh) == tuple:
-    rh = np.array(rh).T
+lh = np.asarray([arr.data for arr in nb.load(args.input[0]).darrays]).T.squeeze()
+rh = np.asarray([arr.data for arr in nb.load(args.input[1]).darrays]).T.squeeze()
 
 lh_shape = lh.shape
 rh_shape = rh.shape
@@ -53,7 +42,18 @@ data_shape = data.shape
 
 del lh, rh
 
-parcellation = load_parcellation('schaefer', scale=400, join=True)
+print('LH shape', lh_shape)
+print('RH shape', rh_shape)
+
+
+parcellation = '/parcellations/Schaefer2018/hcp/Schaefer2018_1000Parcels_7Networks_order.dlabel.nii'
+parcellation = nb.load(parcellation).get_fdata()[0]
+# lh, _, lh_annot_names = fs.read_annot('/parcellations/Schaefer2018/fsaverage5/lh.Schaefer2018_1000Parcels_7Networks_order.annot')
+# rh, _, rh_annot_names = fs.read_annot('/parcellations/Schaefer2018/fsaverage5/rh.Schaefer2018_1000Parcels_7Networks_order.annot')
+# lh_annot_shape = lh.shape
+# rh_annot_shape = rh.shape
+
+print('Parcellation shape:', parcellation.shape)
 labels = np.unique(parcellation)
 labels = labels[labels != 0].tolist()
 data = np.array([np.mean(data[parcellation == l], axis=0) for l in labels])
