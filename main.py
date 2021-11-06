@@ -60,6 +60,8 @@ data = np.array([np.mean(data[parcellation == l], axis=0) for l in labels])
 
 print('Computing correlation matrix')
 corr = ConnectivityMeasure(kind='correlation').fit_transform([data.T])[0]
+row_percentile = np.percentile(corr, 90, axis=1)
+corr[corr < row_percentile] = 0.0
 
 print('Matrix size', corr.shape)
 
