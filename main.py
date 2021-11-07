@@ -3,6 +3,7 @@ import os.path
 
 import nibabel as nb
 from nibabel.gifti.gifti import GiftiImage, GiftiDataArray
+from nilearn import signal
 
 import numpy as np
 from brainspace.gradient import GradientMaps
@@ -19,6 +20,7 @@ parser = argparse.ArgumentParser(description='Connectivity Gradients')
 parser.add_argument('approach', choices=['diffusion-maps', 'laplacian-eigenmaps', 'pca-maps'])
 parser.add_argument('kernel', choices=['pearson', 'spearman', 'normalized-angle', 'cosine', 'gaussian'])
 parser.add_argument('input', nargs=2, metavar=('left', 'right'), type=lambda x: is_valid_file(parser, x))
+parser.add_argument('--confounds', default=None)
 parser.add_argument('--n_components', default=3, type=int)
 parser.add_argument('--random_state', default=0, type=int)
 
@@ -40,11 +42,15 @@ rh_shape = rh.shape
 data = np.concatenate((lh, rh)).astype(np.float32)
 data_shape = data.shape
 
-del lh, rh
-
 print('LH shape', lh_shape)
 print('RH shape', rh_shape)
+del lh, rh
 
+print('Data shape', data.shape)
+if args.confounds is not None:
+    confounds = np.loadtxt(args.confounds, skiprows=1)
+    data = signal.clean(data.T, confounds=confounds).T
+    print('Data shape', data.shape)
 
 parcellation = '/parcellations/Schaefer2018/hcp/Schaefer2018_1000Parcels_7Networks_order.dlabel.nii'
 parcellation = nb.load(parcellation).get_fdata()[0]

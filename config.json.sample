@@ -1,6 +1,7 @@
 {
     "left": "surface-data/left.gii",
     "right": "surface-data/right.gii",
+    "confounds": "regressors.tsv",
     "approach": "diffusion-maps,
     "kernel": "pearson",
     "n_components": 3,

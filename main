@@ -13,7 +13,14 @@ KERNEL=$(jq -r '.kernel // "normalized-angle"' config.json)
 COMPONENTS=$(jq -r '.n_components // 3' config.json)
 RANDOM_STATE=$(jq -r '.random_state // 0' config.json)
 
+CONFOUNDS=$(jq -r '.confounds // ""' config.json)
+
 mkdir -p gradients
 
+OPTS=""
+if [ -z "$CONFOUNDS" ]; then
+    OPTS="$OPTS --confounds $CONFOUNDS"
+fi
+
 time singularity run -e docker://anibalsolon/app-connectivity-gradient:v0.0.1 \
-    python main.py --n_components $COMPONENTS --random_state $RANDOM_STATE $APPROACH $KERNEL $LH_GII $RH_GII
+    python main.py --n_components $COMPONENTS $OPTS --random_state $RANDOM_STATE $APPROACH $KERNEL $LH_GII $RH_GII
