@@ -18,7 +18,7 @@ CONFOUNDS=$(jq -r '.confounds // ""' config.json)
 mkdir -p gradients
 
 OPTS=""
-if [ -z "$CONFOUNDS" ]; then
+if [ -s "$CONFOUNDS" ]; then
     OPTS="$OPTS --confounds $CONFOUNDS"
 fi
 
