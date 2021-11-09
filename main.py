@@ -7,7 +7,6 @@ from nilearn import signal
 
 import numpy as np
 from brainspace.gradient import GradientMaps
-from brainspace.datasets import load_parcellation
 from nilearn.connectome import ConnectivityMeasure
 
 
@@ -21,6 +20,7 @@ parser.add_argument('approach', choices=['diffusion-maps', 'laplacian-eigenmaps'
 parser.add_argument('kernel', choices=['pearson', 'spearman', 'normalized-angle', 'cosine', 'gaussian'])
 parser.add_argument('input', nargs=2, metavar=('left', 'right'), type=lambda x: is_valid_file(parser, x))
 parser.add_argument('--confounds', default=None)
+parser.add_argument('--threshold', default=0.0, type=float)
 parser.add_argument('--n_components', default=3, type=int)
 parser.add_argument('--random_state', default=0, type=int)
 
@@ -66,8 +66,9 @@ data = np.array([np.mean(data[parcellation == l], axis=0) for l in labels])
 
 print('Computing correlation matrix')
 corr = ConnectivityMeasure(kind='correlation').fit_transform([data.T])[0]
-row_percentile = np.percentile(corr, 90, axis=1)
-corr[corr < row_percentile] = 0.0
+if args.threshold > 0.0:
+    row_percentile = np.percentile(corr, args.threshold * 100, axis=1)
+    corr[corr < row_percentile] = 0.0
 
 print('Matrix size', corr.shape)
 

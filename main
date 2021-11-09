@@ -5,8 +5,8 @@
 
 set -xe
 
-LH_GII=$(jq -r .left config.json)
-RH_GII=$(jq -r .right config.json)
+LH_GII=$(jq -r '.left' config.json)
+RH_GII=$(jq -r '.right' config.json)
 
 APPROACH=$(jq -r '.approach // "diffusion-maps"' config.json)
 KERNEL=$(jq -r '.kernel // "normalized-angle"' config.json)
@@ -14,6 +14,7 @@ COMPONENTS=$(jq -r '.n_components // 3' config.json)
 RANDOM_STATE=$(jq -r '.random_state // 0' config.json)
 
 CONFOUNDS=$(jq -r '.confounds // ""' config.json)
+THRESHOLD=$(jq -r '.threshold // 0.' config.json)
 
 mkdir -p gradients
 
@@ -21,6 +22,7 @@ OPTS=""
 if [ -s "$CONFOUNDS" ]; then
     OPTS="$OPTS --confounds $CONFOUNDS"
 fi
+OPTS="$OPTS --threshold $THRESHOLD"
 
 time singularity run -e docker://anibalsolon/app-connectivity-gradient:v0.0.1 \
     python main.py --n_components $COMPONENTS $OPTS --random_state $RANDOM_STATE $APPROACH $KERNEL $LH_GII $RH_GII
