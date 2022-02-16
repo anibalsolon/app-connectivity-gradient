@@ -7,6 +7,7 @@ set -xe
 
 # Temp singularity cleanup
 rm -Rf ~/.local/share/containers/cache
+singularity cache clean -f
 
 LH_GII=$(jq -r '.left' config.json)
 RH_GII=$(jq -r '.right' config.json)
