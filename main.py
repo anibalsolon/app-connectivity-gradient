@@ -48,7 +48,8 @@ del lh, rh
 
 print('Data shape', data.shape)
 if args.confounds is not None:
-    confounds = np.loadtxt(args.confounds, skiprows=1)
+    with open(args.confounds) as f:
+        confounds = np.genfromtxt(f, delimiter='\t', skip_header=1, filling_values=0)
     data = signal.clean(data.T, confounds=confounds).T
     print('Data shape', data.shape)
 
