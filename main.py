@@ -56,11 +56,11 @@ if args.confounds is not None:
     print('Data shape', data.shape)
 
 if args.space == 'hcp' or args.space == 'fsaverage_32k':
-    parcellation = './parcellations/Schaefer2018/hcp/Schaefer2018_1000Parcels_7Networks_order.dlabel.nii'
+    parcellation = '/parcellations/Schaefer2018/hcp/Schaefer2018_1000Parcels_7Networks_order.dlabel.nii'
     parcellation = nb.load(parcellation).get_fdata()[0]
 elif 'fsaverage' in args.space:
-    lh, _, _ = fs.read_annot(f'./parcellations/Schaefer2018/{args.space}/lh.Schaefer2018_1000Parcels_7Networks_order.annot')
-    rh, _, _ = fs.read_annot(f'./parcellations/Schaefer2018/{args.space}/rh.Schaefer2018_1000Parcels_7Networks_order.annot')
+    lh, _, _ = fs.read_annot(f'/parcellations/Schaefer2018/{args.space}/lh.Schaefer2018_1000Parcels_7Networks_order.annot')
+    rh, _, _ = fs.read_annot(f'/parcellations/Schaefer2018/{args.space}/rh.Schaefer2018_1000Parcels_7Networks_order.annot')
     parcellation = np.concatenate((lh, rh))
 
 print('Parcellation shape:', parcellation.shape)
