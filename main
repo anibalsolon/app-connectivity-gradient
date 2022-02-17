@@ -20,6 +20,8 @@ RANDOM_STATE=$(jq -r '.random_state // 0' config.json)
 CONFOUNDS=$(jq -r '.confounds // ""' config.json)
 THRESHOLD=$(jq -r '.threshold // 0.' config.json)
 
+SPACE=$(jq -r '._inputs[] | select(.datatype_tags[] | contains("func")) | .meta.space // "hcp"' config.json)
+
 mkdir -p gradients
 
 OPTS=""
@@ -29,4 +31,9 @@ fi
 OPTS="$OPTS --threshold $THRESHOLD"
 
 time singularity run -e docker://anibalsolon/app-connectivity-gradient:v0.0.1 \
-    python main.py --n_components $COMPONENTS $OPTS --random_state $RANDOM_STATE $APPROACH $KERNEL $LH_GII $RH_GII
+    python main.py \
+        --space $SPACE \
+        --n_components $COMPONENTS \
+        $OPTS \
+        --random_state $RANDOM_STATE \
+        $APPROACH $KERNEL $LH_GII $RH_GII

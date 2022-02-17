@@ -2,6 +2,7 @@ import argparse
 import os.path
 
 import nibabel as nb
+import nibabel.freesurfer as fs
 from nibabel.gifti.gifti import GiftiImage, GiftiDataArray
 from nilearn import signal
 
@@ -22,6 +23,7 @@ parser.add_argument('input', nargs=2, metavar=('left', 'right'), type=lambda x: 
 parser.add_argument('--confounds', default=None)
 parser.add_argument('--threshold', default=0.0, type=float)
 parser.add_argument('--n_components', default=3, type=int)
+parser.add_argument('--space', choices=['fsaverage', 'fsaverage5', 'fsaverage6', 'hcp'])
 parser.add_argument('--random_state', default=0, type=int)
 
 args = parser.parse_args()
@@ -53,12 +55,13 @@ if args.confounds is not None:
     data = signal.clean(data.T, confounds=confounds).T
     print('Data shape', data.shape)
 
-parcellation = '/parcellations/Schaefer2018/hcp/Schaefer2018_1000Parcels_7Networks_order.dlabel.nii'
-parcellation = nb.load(parcellation).get_fdata()[0]
-# lh, _, lh_annot_names = fs.read_annot('/parcellations/Schaefer2018/fsaverage5/lh.Schaefer2018_1000Parcels_7Networks_order.annot')
-# rh, _, rh_annot_names = fs.read_annot('/parcellations/Schaefer2018/fsaverage5/rh.Schaefer2018_1000Parcels_7Networks_order.annot')
-# lh_annot_shape = lh.shape
-# rh_annot_shape = rh.shape
+if args.space == 'hcp' or args.space == 'fsaverage_32k':
+    parcellation = './parcellations/Schaefer2018/hcp/Schaefer2018_1000Parcels_7Networks_order.dlabel.nii'
+    parcellation = nb.load(parcellation).get_fdata()[0]
+elif 'fsaverage' in args.space:
+    lh, _, _ = fs.read_annot(f'./parcellations/Schaefer2018/{args.space}/lh.Schaefer2018_1000Parcels_7Networks_order.annot')
+    rh, _, _ = fs.read_annot(f'./parcellations/Schaefer2018/{args.space}/rh.Schaefer2018_1000Parcels_7Networks_order.annot')
+    parcellation = np.concatenate((lh, rh))
 
 print('Parcellation shape:', parcellation.shape)
 labels = np.unique(parcellation)
