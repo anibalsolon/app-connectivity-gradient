@@ -22,6 +22,12 @@ THRESHOLD=$(jq -r '.threshold // 0.' config.json)
 
 SPACE=$(jq -r '._inputs[] | select(.datatype_tags[] | contains("func")) | .meta.space // "hcp"' config.json)
 
+HCP_DOUBLECHECK=$(jq -r '._inputs[] | select(.tags[] | contains("fsaverage_32k"))')
+if [ ! -z "$HCP_DOUBLECHECK" ]
+then
+    SPACE="hcp"
+fi
+
 mkdir -p gradients
 
 OPTS=""
