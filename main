@@ -22,7 +22,7 @@ THRESHOLD=$(jq -r '.threshold // 0.' config.json)
 
 SPACE=$(jq -r '._inputs[] | select(.datatype_tags[] | contains("func")) | .meta.space // "hcp"' config.json)
 
-HCP_DOUBLECHECK=$(jq -r '._inputs[] | select(.tags[] | contains("fsaverage_32k"))')
+HCP_DOUBLECHECK=$(jq -r '._inputs[] | select(.tags[] | contains("fsaverage_32k"))' config.json)
 if [ ! -z "$HCP_DOUBLECHECK" ]
 then
     SPACE="hcp"
