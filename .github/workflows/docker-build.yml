@@ -41,4 +41,5 @@ jobs:
         uses: docker/build-push-action@v3
         with:
           push: true
+          platforms: linux/amd64,linux/ppc64le
           tags: ${{ env.DOCKER_IMAGE }}:${{ env.DOCKER_TAG }}
