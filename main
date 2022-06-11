@@ -9,6 +9,13 @@ set -xe
 #rm -Rf ~/.local/share/containers/cache
 #singularity cache clean -f
 
+export $(cat .env | xargs)
+DEFAULT_BRANCH=$(git remote show origin | grep 'HEAD branch' | cut -d' ' -f5)
+DOCKER_TAG=$(git branch --show-current)
+if [ "$DEFAULT_BRANCH" = "$BRANCH" ]; then
+    DOCKER_TAG=latest
+fi
+
 LH_GII=$(jq -r '.left' config.json)
 RH_GII=$(jq -r '.right' config.json)
 
@@ -36,7 +43,7 @@ if [ -s "$CONFOUNDS" ]; then
 fi
 OPTS="$OPTS --threshold $THRESHOLD"
 
-time singularity run -e docker://anibalsolon/app-connectivity-gradient:v0.0.1 \
+time singularity run -e docker://$DOCKER_IMAGE:$DOCKER_TAG \
     python main.py \
         --space $SPACE \
         --n_components $COMPONENTS \

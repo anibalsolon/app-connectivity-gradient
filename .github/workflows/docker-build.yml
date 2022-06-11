@@ -1,0 +1,41 @@
+name: docker-build
+
+jobs:
+  docker:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+        
+      - name: Import environment variables from a file
+        run: |
+          while read line; do
+            echo "$line" >> $GITHUB_ENV
+          done < ./.env
+
+          DOCKER_TAG=$BRANCH
+          if [ "$DEFAULT_BRANCH" = "$BRANCH" ]; then
+            DOCKER_TAG=latest
+          fi
+          echo "DOCKER_TAG=$DOCKER_TAG" >> $GITHUB_ENV
+        env:
+          DEFAULT_BRANCH: ${{ github.event.repository.default_branch }} 
+          BRANCH: ${{ github.head_ref || github.ref_name }} 
+
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v2
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v2
+
+      # - name: Login to DockerHub
+      #   uses: docker/login-action@v2
+      #   with:
+      #     username: ${{ secrets.DOCKERHUB_USERNAME }}
+      #     password: ${{ secrets.DOCKERHUB_TOKEN }}
+  
+      - name: Build and push
+        uses: docker/build-push-action@v3
+        with:
+          push: true
+          tags: ${{ env.DOCKER_IMAGE }}:${{ env.DOCKER_TAG }}
