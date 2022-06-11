@@ -7,7 +7,8 @@ RUN apt-get update && \
 
 RUN curl -LO http://ftp.debian.org/debian/pool/main/libx/libxp/libxp6_1.0.2-2_amd64.deb && \
     curl -LO http://mirrors.kernel.org/ubuntu/pool/main/libp/libpng/libpng12-0_1.2.54-1ubuntu1_amd64.deb && \
-    apt-get install -y ./libxp6_1.0.2-2_amd64.deb ./libpng12-0_1.2.54-1ubuntu1_amd64.deb && \
+    dpkg --ignore-depends=multiarch-support -i ./libxp6_1.0.2-2_amd64.deb && \
+    dpkg --ignore-depends=multiarch-support -i ./libpng12-0_1.2.54-1ubuntu1_amd64.deb && \
     rm ./libxp6_1.0.2-2_amd64.deb ./libpng12-0_1.2.54-1ubuntu1_amd64.deb
 
 ENV PARCELLATIONS_REPO="https://github.com/ThomasYeoLab/CBIG/blob/master/stable_projects/brain_parcellation/Schaefer2018_LocalGlobal/Parcellations"
